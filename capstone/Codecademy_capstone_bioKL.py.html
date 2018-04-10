@@ -1,0 +1,300 @@
+
+# coding: utf-8
+
+# In[1]:
+
+
+from matplotlib import pyplot as plt
+import pandas as pd
+
+
+# In[2]:
+
+
+species = pd.read_csv('species_info.csv')
+
+
+# In[3]:
+
+
+species.head(10)
+
+
+# In[4]:
+
+
+species.scientific_name.nunique()
+
+
+# In[5]:
+
+
+species.category.unique()
+
+
+# In[6]:
+
+
+species.conservation_status.unique()
+
+
+# In[7]:
+
+
+species.groupby('conservation_status').scientific_name.nunique()
+
+
+# In[8]:
+
+
+species.groupby('conservation_status').scientific_name.nunique().reset_index()
+
+
+# In[9]:
+
+
+species.fillna('No intervention', inplace = true)
+
+
+# In[10]:
+
+
+species.fillna('No Intervention', inplace = True)
+
+
+# In[11]:
+
+
+species.groupby('conservation_status').scientific_name.nunique().reset_index()
+
+
+# In[12]:
+
+
+protection_counts = species.groupby('conservation_status').scientific_name.count().reset_index().sort_value(by = 'scientific_name')
+
+
+# In[14]:
+
+
+protection_counts = species.groupby('conservation_status').scientific_name.count().reset_index().sort_values(by = 'scientific_name')
+
+
+# In[15]:
+
+
+plt.bar('protection_counts')
+
+
+# In[17]:
+
+
+plt.figure(figsize = (10,4))
+ax = plt.subplot()
+plt.bar(range(len(protection_counts)), protection_counts.scientific_name.values)
+ax.set_xticks(range(len(protection_counts)))
+ax.set_xticklabels(protection_counts.conservation_status.values)
+plt.ylabel('number of species')
+plt.title('Conservation Status by Species')
+plt.show()
+
+
+# In[19]:
+
+
+species['is_protected']= species.conservation_status != 'No Intervention'
+
+
+# In[20]:
+
+
+category_counts = species.groupby(['category', 'is_protected']).scientific_name.nunique()
+
+
+# In[21]:
+
+
+category_counts.head()
+
+
+# In[22]:
+
+
+category_counts = species.groupby(['category', 'is_protected']).scientific_name.nunique().reset_index()
+
+
+# In[23]:
+
+
+category_counts.head()
+
+
+# In[25]:
+
+
+cat_pivot= category_counts.pivot(columns='is_protected',
+                                 index = 'category', 
+                                 values = 'scientific_name').reset_index()
+
+
+# In[28]:
+
+
+cat_pivot
+
+
+# In[29]:
+
+
+cat_pivot.columns = ['category', 'not_protected', 'protected']
+
+
+# In[30]:
+
+
+cat_pivot
+
+
+# In[31]:
+
+
+cat_pivot['percent_protected'] = cat_pivot.protected/(cat_pivot.protected + cat_pivot.not_protected)
+
+
+# In[32]:
+
+
+cat_pivot
+
+
+# In[34]:
+
+
+contingency = [[30, 146], [75,413]]
+
+
+# In[35]:
+
+
+from scipy.stats import chi2_contingency
+
+
+# In[36]:
+
+
+chi2_contingency(contingency)
+
+
+# In[37]:
+
+
+contingency = [[30, 146],
+               [5, 73]]
+chi2_contingency(contingency)
+
+
+# In[40]:
+
+
+observations = pd.read_csv('observations.csv')
+
+
+# In[41]:
+
+
+observations.head()
+
+
+# In[42]:
+
+
+observations.scientific_name.nunique()
+
+
+# In[46]:
+
+
+species['is_sheep'] = species.common_names.apply(lambda x: 'Sheep' in x)
+species.head()
+
+
+# In[47]:
+
+
+species[species.is_sheep]
+
+
+# In[48]:
+
+
+sheep_species = species[(species.is_sheep) & (species.category == 'Mammal')]
+
+
+# In[49]:
+
+
+sheep_species
+
+
+# In[50]:
+
+
+sheep_observations = observations.merge(sheep_species)
+sheep_observations
+
+
+# In[51]:
+
+
+obs_by_park = sheep_observations.groupby('park_name').observations.sum().reset_index()
+obs_by_park
+
+
+# In[52]:
+
+
+plt.figure(figsize=(16, 4))
+ax = plt.subplot()
+plt.bar(range(len(obs_by_park)),
+        obs_by_park.observations.values)
+ax.set_xticks(range(len(obs_by_park)))
+ax.set_xticklabels(obs_by_park.park_name.values)
+plt.ylabel('Number of Observations')
+plt.title('Observations of Sheep per Week')
+plt.show()
+
+
+# In[53]:
+
+
+minimum_detectable_effect = 100 * 0.05 / 0.15
+minimum_detectable_effect
+
+
+# In[54]:
+
+
+bryce = 510 / 250.
+yellowstone = 510 / 507.
+
+# Approximately 2 weeks at Bryce and 1 week at Yellowstone.
+
+
+# In[56]:
+
+
+bryce
+yellowstone
+
+
+# In[57]:
+
+
+bryce
+
+
+# In[58]:
+
+
+species
+
